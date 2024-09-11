@@ -1,7 +1,7 @@
 package me.mkbaka.simplecommand.platform;
 
+import me.mkbaka.simplecommand.common.command.CommandNotify;
 import me.mkbaka.simplecommand.common.command.argument.TypeFactory;
-import me.mkbaka.simplecommand.common.command.permission.PermissionDefault;
 import me.mkbaka.simplecommand.common.util.ComponentExtraJava;
 import me.mkbaka.simplecommand.common.util.SimpleMainCommand;
 import me.mkbaka.simplecommand.common.util.SimpleSubCommand;
@@ -17,6 +17,9 @@ public class ExampleCommand {
 
     @CommandBody
     public static final SimpleMainCommand main = ComponentExtraJava.mainCommand(literal -> {
+        literal.onPermissionCheckFailure(new CommandNotify((source, input, header, args) -> {
+            // TODO
+        }));
         literal.execute(context -> {
             System.out.println("this is main command");
         });

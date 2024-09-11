@@ -5,15 +5,7 @@ import org.bukkit.command.CommandSender
 
 class BukkitCommandSource(
     private val sender: CommandSender
-) : CommandSource {
-
-    override fun hasPermission(perm: String): Boolean {
-        return sender.hasPermission(perm)
-    }
-
-    override fun sendMessage(str: String) {
-        sender.sendMessage(str)
-    }
+) : CommandSource, CommandSender by sender {
 
     override fun toString(): String {
         return sender.toString()

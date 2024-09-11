@@ -5,7 +5,7 @@ import me.mkbaka.simplecommand.common.CommandSource
 import me.mkbaka.simplecommand.common.command.CommandNotify
 import me.mkbaka.simplecommand.common.command.ExecutorContext
 import me.mkbaka.simplecommand.common.command.argument.TypeFactory
-import me.mkbaka.simplecommand.common.command.argument.TypeString
+import me.mkbaka.simplecommand.common.command.argument.impl.TypeString
 import me.mkbaka.simplecommand.common.command.argument.WrappedArgumentType
 import me.mkbaka.simplecommand.common.command.permission.Permissible
 import me.mkbaka.simplecommand.common.command.permission.PermissionDefault
@@ -16,28 +16,64 @@ import java.util.function.Consumer
  */
 abstract class CommandComponent<R> : Permissible {
 
+    /**
+     * 父组件
+     */
     var parent: CommandComponent<*>? = null
         private set
 
+    /**
+     * 子组件
+     */
     val children = ArrayList<CommandComponent<*>>()
 
+    /**
+     * 参数错误回调
+     */
     internal var invalidArgument: CommandNotify? = null
         private set
 
+    /**
+     * 未通过权限判断回调
+     */
     internal var permissionFailure: CommandNotify? = null
         private set
 
     internal abstract fun build(): R
 
+    /**
+     * 设置参数错误时的回调
+     *
+     * @param [callback]
+     */
     fun incorrectArgument(callback: CommandNotify) {
         this.invalidArgument = callback
     }
 
+    /**
+     * 设置权限判断未通过时的回调
+     *
+     * @param [callback]
+     */
     override fun onPermissionCheckFailure(callback: CommandNotify) {
         this.permissionFailure = callback
     }
 
-    open fun append(subComponent: CommandComponent<*>): CommandComponent<*> {
+    protected fun ArgumentBuilder<CommandSource, *>.register(component: CommandComponent<*>) {
+        when (component) {
+            is ExecutorComponent -> executes {
+                component.executor!!.invoke(ExecutorContext(it))
+                1
+            }
+
+            is LiteralComponent -> component.build().forEach(this::then)
+
+            is DynamicComponent<*> -> then(component.build())
+            else -> error("Unexpected child type: $component")
+        }
+    }
+
+    private fun append(subComponent: CommandComponent<*>): CommandComponent<*> {
         subComponent.parent = this
         children.add(subComponent)
         return this
@@ -107,7 +143,7 @@ abstract class CommandComponent<R> : Permissible {
         name: String,
         type: WrappedArgumentType<*> = TypeString.word(),
         permission: String = "",
-        permissionDefault: PermissionDefault = PermissionDefault.REQUIRE,
+        permissionDefault: PermissionDefault = PermissionDefault.ALLOW,
         callback: DynamicComponent<*>.() -> Unit
     ): CommandComponent<*> {
         append(DynamicComponent(name, type, permission, permissionDefault).also(callback))
@@ -151,20 +187,6 @@ abstract class CommandComponent<R> : Permissible {
     open fun execute(callback: (ExecutorContext) -> Unit): CommandComponent<*> {
         append(ExecutorComponent().executor(callback))
         return this
-    }
-
-    protected fun ArgumentBuilder<CommandSource, *>.register(component: CommandComponent<*>) {
-        when (component) {
-            is ExecutorComponent -> executes {
-                component.executor!!.invoke(ExecutorContext(it))
-                1
-            }
-
-            is LiteralComponent -> component.build().forEach(this::then)
-
-            is DynamicComponent<*> -> then(component.build())
-            else -> error("Unexpected child type: $component")
-        }
     }
 
 }

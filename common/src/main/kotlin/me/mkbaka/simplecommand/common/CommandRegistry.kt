@@ -6,9 +6,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
+import me.mkbaka.simplecommand.common.command.CommandNotify
 import me.mkbaka.simplecommand.common.command.component.CommandComponent
 import me.mkbaka.simplecommand.common.command.component.LiteralComponent
 import me.mkbaka.simplecommand.common.command.component.RootComponent
+import me.mkbaka.simplecommand.common.command.permission.PermissionDefault
 import me.mkbaka.simplecommand.common.command.wrapper.WrappedCommandNode
 import me.mkbaka.simplecommand.common.exceptions.CommandNotFoundException
 import me.mkbaka.simplecommand.common.util.LowerCaseContainer
@@ -93,22 +95,21 @@ abstract class CommandRegistry(
     fun execute(source: CommandSource, header: String, args: Array<String>) {
         val preparation = prepareCommand(source, header, args)
 
-        if (preparation.currentComponent.isFailure(source)) {
-            return findNotify(
-                preparation.currentComponent,
-                "Cannot find permission notify for this commands."
-            ) { comp ->
-                comp.permissionFailure
-            }.invoke(source, preparation.inputString, header, args)
-        }
+        if (!checkPermission(preparation, source, header, args)) return
 
+        // 执行命令
         try {
             preparation.execute()
         } catch (e: CommandSyntaxException) {
+            // 子节点错误, 参数错误, 不在数值类参数限定范围 等等... 统一执行参数错误的回调
             if (e.type::class.java in exceptionTypes) {
-                findNotify(preparation.currentComponent, "Cannot find argument notify for this commands.") { comp ->
-                    comp.invalidArgument
-                }.invoke(source, preparation.inputString, header, args)
+                // RootComponent 会在 init 中赋值, 所以这个报错一定不会出现
+                findNotNull(
+                    preparation.currentComponent,
+                    "Cannot find argument notify for this commands."
+                ) { comp ->
+                    comp.invalidArgument != null
+                }.invalidArgument!!.invoke(source, preparation.inputString, header, args)
             } else {
                 e.printStackTrace()
             }
@@ -124,13 +125,13 @@ abstract class CommandRegistry(
      * @return [List<String>]
      */
     fun tabCompleter(source: CommandSource, header: String, args: Array<String>): List<String> {
-        val preparation = prepareCommand(source, header, args)
+        return prepareCommand(source, header, args).run {
+            when {
+                !checkPermission(this, source, header, args) -> emptyList()
 
-        if (preparation.currentComponent.isFailure(source)) {
-            return emptyList()
+                else -> this.getSuggestTexts()
+            }
         }
-
-        return preparation.getSuggestTexts()
     }
 
     private val String.rootComponent: RootComponent?
@@ -152,15 +153,47 @@ abstract class CommandRegistry(
         return Pair(rootComponent, dispatcher)
     }
 
-    private fun <T : Any> findNotify(
+    private fun checkPermission(
+        preparation: CommandPreparation,
+        source: CommandSource,
+        header: String,
+        args: Array<String>
+    ): Boolean {
+        // 查找需要判断权限的父组件
+        findOrNull(preparation.currentComponent) {
+            it.permissionDefault == PermissionDefault.REQUIRE
+        }?.let { comp ->
+            // 若权限不足则执行回调并退出执行
+            if (!source.hasPermission(comp.permission)) {
+                // 查找赋值过的回调函数
+                // RootComponent 会在 init 中赋值, 所以错误信息一定不会出现
+                findNotNull(
+                    preparation.currentComponent,
+                    "Cannot find permission notify for this commands."
+                ) {
+                    it.permissionFailure != null
+                }.permissionFailure!!.invoke(source, preparation.inputString, header, args)
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun findOrNull(
+        start: CommandComponent<*>,
+        selector: (CommandComponent<*>) -> Boolean
+    ): CommandComponent<*>? {
+        return generateSequence(start) {
+            it.parent
+        }.firstOrNull(selector)
+    }
+
+    private fun findNotNull(
         start: CommandComponent<*>,
         errorMsg: String,
-        selector: (CommandComponent<*>) -> T?
-    ): T {
-        return generateSequence(start) { it.parent }
-            .mapNotNull(selector)
-            .firstOrNull()
-            ?: throw IllegalStateException(errorMsg)
+        selector: (CommandComponent<*>) -> Boolean
+    ): CommandComponent<*> {
+        return findOrNull(start, selector) ?: error(errorMsg)
     }
 
     private fun ParseResults<*>.getCurrentComponent(): CommandComponent<*> {

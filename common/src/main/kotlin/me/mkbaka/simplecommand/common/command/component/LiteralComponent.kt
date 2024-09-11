@@ -5,6 +5,9 @@ import me.mkbaka.simplecommand.common.CommandSource
 import me.mkbaka.simplecommand.common.command.permission.PermissionDefault
 import me.mkbaka.simplecommand.common.command.wrapper.SimpleLiteralBuilder
 
+/**
+ * 明文节点组件
+ */
 class LiteralComponent(
     val name: String,
     val aliases: Array<String> = emptyArray(),

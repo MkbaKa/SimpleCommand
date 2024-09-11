@@ -11,10 +11,6 @@ interface Permissible {
 
     fun onPermissionCheckFailure(callback: CommandNotify)
 
-    fun isFailure(source: CommandSource): Boolean {
-        return requirePermission() && !source.hasPermission(permission)
-    }
-
     fun requirePermission() = permissionDefault == PermissionDefault.REQUIRE && permission.isNotEmpty()
 
 }

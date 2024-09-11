@@ -1,9 +1,11 @@
-package me.mkbaka.simplecommand.common.command.argument
+package me.mkbaka.simplecommand.common.command.argument.impl
 
 import com.mojang.brigadier.StringReader
+import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import me.mkbaka.simplecommand.common.command.argument.WrappedArgumentType
 import java.util.concurrent.CompletableFuture
 
 class TypeString(
@@ -29,22 +31,22 @@ class TypeString(
 
     enum class StringType {
         SINGLE_WORD {
-            override fun get(): com.mojang.brigadier.arguments.StringArgumentType {
-                return com.mojang.brigadier.arguments.StringArgumentType.word()
+            override fun get(): StringArgumentType {
+                return StringArgumentType.word()
             }
         },
         QUOTABLE_PHRASE {
-            override fun get(): com.mojang.brigadier.arguments.StringArgumentType {
-                return com.mojang.brigadier.arguments.StringArgumentType.string()
+            override fun get(): StringArgumentType {
+                return StringArgumentType.string()
             }
         },
         GREEDY_PHRASE {
-            override fun get(): com.mojang.brigadier.arguments.StringArgumentType {
-                return com.mojang.brigadier.arguments.StringArgumentType.greedyString()
+            override fun get(): StringArgumentType {
+                return StringArgumentType.greedyString()
             }
         };
 
-        abstract fun get(): com.mojang.brigadier.arguments.StringArgumentType
+        abstract fun get(): StringArgumentType
     }
 
     companion object {

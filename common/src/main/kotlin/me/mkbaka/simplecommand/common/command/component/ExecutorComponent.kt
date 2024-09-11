@@ -6,6 +6,9 @@ import me.mkbaka.simplecommand.common.command.ExecutorContext
 import me.mkbaka.simplecommand.common.command.argument.WrappedArgumentType
 import me.mkbaka.simplecommand.common.command.permission.PermissionDefault
 
+/**
+ * 命令执行组件
+ */
 class ExecutorComponent : CommandComponent<RequiredArgumentBuilder<CommandSource, String>>() {
 
     override val permission: String
@@ -19,10 +22,6 @@ class ExecutorComponent : CommandComponent<RequiredArgumentBuilder<CommandSource
     fun executor(executor: (ExecutorContext) -> Unit): ExecutorComponent {
         this.executor = executor
         return this
-    }
-
-    override fun append(subComponent: CommandComponent<*>): CommandComponent<*> {
-        throw IllegalStateException("ExecutorComponent cannot append children")
     }
 
     override fun argument(

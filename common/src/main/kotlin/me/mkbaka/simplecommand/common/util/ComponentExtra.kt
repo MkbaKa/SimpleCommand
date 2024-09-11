@@ -19,13 +19,13 @@ fun simpleComponentOf(obj: Any): RootComponent? {
         field.isAccessible = true
         when (val simple = field.get(obj)) {
             is SimpleSubCommand -> {
-                val subComponent = LiteralComponent(
+                commandHeader.literal(
                     field.name,
                     body.aliases,
                     body.permission,
-                    body.permissionDefault
-                ).also(simple.callback)
-                commandHeader.append(subComponent)
+                    body.permissionDefault,
+                    simple.callback
+                )
             }
 
             is SimpleMainCommand -> commandHeader.also(simple.callback)

@@ -1,10 +1,11 @@
-package me.mkbaka.simplecommand.common.command.argument
+package me.mkbaka.simplecommand.common.command.argument.impl
 
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.FloatArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import me.mkbaka.simplecommand.common.command.argument.WrappedArgumentType
 import java.util.concurrent.CompletableFuture
 
 class TypeFloat(

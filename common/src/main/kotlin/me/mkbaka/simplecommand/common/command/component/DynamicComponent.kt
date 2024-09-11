@@ -4,6 +4,9 @@ import me.mkbaka.simplecommand.common.command.argument.WrappedArgumentType
 import me.mkbaka.simplecommand.common.command.permission.PermissionDefault
 import me.mkbaka.simplecommand.common.command.wrapper.SimpleDynamicBuilder
 
+/**
+ * 参数组件
+ */
 class DynamicComponent<T>(
     val name: String,
     private val type: WrappedArgumentType<T>,
