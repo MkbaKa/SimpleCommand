@@ -11,8 +11,9 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/MkbaKa/SimpleCommand")
         credentials {
-            username = System.getenv("GITHUB_NAME")
-            password = System.getenv("GITHUB_PACKAGES_TOKEN")
+            // 请自行更改
+            username = "..."
+            password = "..."
         }
     }
 }
@@ -28,8 +29,9 @@ repositories {
     maven {
         url "https://maven.pkg.github.com/MkbaKa/SimpleCommand"
         credentials {
-            username = System.getenv("GITHUB_NAME")
-            password = System.getenv("GITHUB_PACKAGES_TOKEN")
+            // 请自行更改
+            username = "..."
+            password = "..."
         }
     }
 }
