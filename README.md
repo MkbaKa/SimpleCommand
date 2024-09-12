@@ -19,6 +19,10 @@ repositories {
 }
 
 dependencies {
+    // common 模块不包含任何平台实现
+    // implementation("me.mkbaka.simplecommand:common:1.0.0")
+    
+    // Bukkit 平台实现, 该依赖会自动包含 common 模块
     implementation("me.mkbaka.simplecommand:platform-bukkit:1.0.0")
 }
 ```
@@ -43,8 +47,7 @@ dependencies {
 
 ## 食用方式
 
-在保证已经实现 **平台命令注册** 的前提下,可以直接创建一个 CommandRegistry 来注册命令.   
-以 Bukkit 为例:
+在保证已经实现 **平台命令注册** 的前提下,可以直接创建一个 CommandRegistry 来注册命令.
 
 #### kotlin:
 ```kotlin
