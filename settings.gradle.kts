@@ -7,4 +7,3 @@ rootProject.name = "SimpleCommand"
 
 include("common")
 include("platform-bukkit")
-include("plugin")

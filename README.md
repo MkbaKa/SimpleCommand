@@ -2,7 +2,44 @@
 
 > 最终呈现效果借鉴自 [TabooLib](https://github.com/TabooLib/taboolib)
 
-### 注册命令
+## 添加依赖
+
+### gradle (kotlin)
+
+```kotlin 
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/MkbaKa/SimpleCommand")
+        credentials {
+            username = System.getenv("GITHUB_NAME")
+            password = System.getenv("GITHUB_PACKAGES_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation("me.mkbaka.simplecommand:platform-bukkit:1.0.0")
+}
+```
+
+### gradle (groovy)
+```groovy
+repositories {
+    maven {
+        url "https://maven.pkg.github.com/MkbaKa/SimpleCommand"
+        credentials {
+            username = System.getenv("GITHUB_NAME")
+            password = System.getenv("GITHUB_PACKAGES_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation 'me.mkbaka.simplecommand:platform-bukkit:1.0.0'
+}
+```
+
+## 食用方式
 
 在保证已经实现 **平台命令注册** 的前提下,可以直接创建一个 CommandRegistry 来注册命令.   
 以 Bukkit 为例:

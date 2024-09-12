@@ -1,5 +1,5 @@
-repositories {
-    maven("https://libraries.minecraft.net")
+dependencies {
+    implementation("com.mojang:brigadier:1.2.9")
 }
 
 gradle.buildFinished {

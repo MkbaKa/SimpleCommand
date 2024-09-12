@@ -4,6 +4,10 @@ import com.mojang.brigadier.tree.RootCommandNode
 import me.mkbaka.simplecommand.common.CommandSource
 import me.mkbaka.simplecommand.common.command.CommandNotify
 
+/**
+ * 只是一个数据类
+ * 实际的命令头组件是 subComponent
+ */
 class RootComponent(
     private val name: String,
     val subComponent: LiteralComponent
