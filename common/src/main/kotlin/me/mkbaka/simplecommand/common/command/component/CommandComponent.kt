@@ -80,10 +80,23 @@ abstract class CommandComponent<R> : Permissible {
     }
 
     open fun argument(
+        name: String
+    ): CommandComponent<*> {
+        return dynamic(name)
+    }
+
+    open fun argument(
         name: String,
         callback: Consumer<DynamicComponent<*>>
     ): CommandComponent<*> {
         return dynamic(name, callback)
+    }
+
+    open fun argument(
+        name: String,
+        type: WrappedArgumentType<*>
+    ): CommandComponent<*> {
+        return argument(name, type, "", PermissionDefault.ALLOW)
     }
 
     open fun argument(
@@ -108,10 +121,25 @@ abstract class CommandComponent<R> : Permissible {
         name: String,
         type: WrappedArgumentType<*> = TypeString.word(),
         permission: String = "",
+        permissionDefault: PermissionDefault = PermissionDefault.REQUIRE
+    ): CommandComponent<*> {
+        return dynamic(name, type, permission, permissionDefault)
+    }
+
+    open fun argument(
+        name: String,
+        type: WrappedArgumentType<*> = TypeString.word(),
+        permission: String = "",
         permissionDefault: PermissionDefault = PermissionDefault.REQUIRE,
         callback: DynamicComponent<*>.() -> Unit
     ): CommandComponent<*> {
         return dynamic(name, type, permission, permissionDefault, callback)
+    }
+
+    open fun dynamic(
+        name: String
+    ): CommandComponent<*> {
+        return dynamic(name, TypeFactory.word(), "", PermissionDefault.ALLOW)
     }
 
     open fun dynamic(
@@ -123,10 +151,26 @@ abstract class CommandComponent<R> : Permissible {
 
     open fun dynamic(
         name: String,
+        type: WrappedArgumentType<*>
+    ): CommandComponent<*> {
+        return dynamic(name, type, "", PermissionDefault.ALLOW)
+    }
+
+    open fun dynamic(
+        name: String,
         type: WrappedArgumentType<*>,
         callback: Consumer<DynamicComponent<*>>
     ): CommandComponent<*> {
         return dynamic(name, type, "", PermissionDefault.ALLOW, callback)
+    }
+
+    open fun dynamic(
+        name: String,
+        type: WrappedArgumentType<*>,
+        permission: String,
+        permissionDefault: PermissionDefault
+    ): CommandComponent<*> {
+        return dynamic(name, type, permission, permissionDefault) {}
     }
 
     open fun dynamic(
@@ -151,6 +195,26 @@ abstract class CommandComponent<R> : Permissible {
     }
 
     open fun literal(
+        name: String
+    ): CommandComponent<*> {
+        return literal(name, emptyArray())
+    }
+
+    open fun literal(
+        name: String,
+        aliases: Array<String>
+    ): CommandComponent<*> {
+        return literal(name, aliases, "", PermissionDefault.ALLOW)
+    }
+
+    open fun literal(
+        name: String,
+        callback: Consumer<LiteralComponent>
+    ): CommandComponent<*> {
+        return literal(name, emptyArray(), "", PermissionDefault.ALLOW, callback)
+    }
+
+    open fun literal(
         name: String,
         aliases: Array<String>,
         callback: Consumer<LiteralComponent>
@@ -172,6 +236,15 @@ abstract class CommandComponent<R> : Permissible {
         name: String,
         aliases: Array<String> = arrayOf(),
         permission: String = "",
+        permissionDefault: PermissionDefault = PermissionDefault.REQUIRE
+    ): CommandComponent<*> {
+        return literal(name, aliases, permission, permissionDefault) {}
+    }
+
+    open fun literal(
+        name: String,
+        aliases: Array<String> = arrayOf(),
+        permission: String = "",
         permissionDefault: PermissionDefault = PermissionDefault.REQUIRE,
         callback: LiteralComponent.() -> Unit
     ): CommandComponent<*> {
@@ -179,14 +252,12 @@ abstract class CommandComponent<R> : Permissible {
         return this
     }
 
-    open fun execute(consumer: Consumer<ExecutorContext>): CommandComponent<*> {
+    open fun execute(consumer: Consumer<ExecutorContext>) {
         execute { consumer.accept(it) }
-        return this
     }
 
-    open fun execute(callback: (ExecutorContext) -> Unit): CommandComponent<*> {
+    open fun execute(callback: (ExecutorContext) -> Unit) {
         append(ExecutorComponent().executor(callback))
-        return this
     }
 
 }
