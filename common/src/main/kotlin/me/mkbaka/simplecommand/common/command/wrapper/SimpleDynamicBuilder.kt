@@ -22,7 +22,7 @@ class SimpleDynamicBuilder<T>(
         val result = DynamicCommandNode(
             component, name, type, command, requirement, redirect, redirectModifier, isFork
         ) { context, builder ->
-            component.suggest?.invoke(SuggestionContext(builder), ExecutorContext(context))?.forEach {
+            component.suggest?.invoke(SuggestionContext(builder ,context))?.forEach {
                 builder.suggest(it)
             }
             builder.buildFuture()

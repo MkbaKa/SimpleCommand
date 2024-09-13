@@ -90,7 +90,7 @@ class TestCommand {
         // 不然这个this会被推断成 this@subCommand 导致结构出错
         dynamic("key") {
             // 命令建议
-            suggest { suggestionContext, executorContext ->
+            suggest { suggestionContext ->
                 listOf("value1", "value2", "value3")
             }
             

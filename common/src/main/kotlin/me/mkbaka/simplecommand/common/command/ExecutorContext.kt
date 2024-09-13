@@ -3,8 +3,8 @@ package me.mkbaka.simplecommand.common.command
 import com.mojang.brigadier.context.CommandContext
 import me.mkbaka.simplecommand.common.CommandSource
 
-data class ExecutorContext(
-    internal val original: CommandContext<CommandSource>
+open class ExecutorContext(
+    private val original: CommandContext<CommandSource>
 ) {
 
     /**
