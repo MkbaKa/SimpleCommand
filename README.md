@@ -85,7 +85,15 @@ class TestCommand {
 
     @CommandBody
     val run = subCommand {
+        // kotlin 请使用 dynamic 函数创建命令参数
+        // 如果用 argument 需要显式声明lambda参数名(或者使用 it.xxx 调用)
+        // 不然这个this会被推断成 this@subCommand 导致结构出错
         dynamic("key") {
+            // 命令建议
+            suggest { suggestionContext, executorContext ->
+                listOf("value1", "value2", "value3")
+            }
+            
             execute {
                 println("key = ${it["key"]}")
             }

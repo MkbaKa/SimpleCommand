@@ -1,5 +1,7 @@
 package me.mkbaka.simplecommand.common.command.component
 
+import me.mkbaka.simplecommand.common.command.ExecutorContext
+import me.mkbaka.simplecommand.common.command.SuggestionContext
 import me.mkbaka.simplecommand.common.command.argument.WrappedArgumentType
 import me.mkbaka.simplecommand.common.command.permission.PermissionDefault
 import me.mkbaka.simplecommand.common.command.wrapper.SimpleDynamicBuilder
@@ -13,6 +15,13 @@ class DynamicComponent<T>(
     override val permission: String,
     override val permissionDefault: PermissionDefault
 ) : CommandComponent<SimpleDynamicBuilder<T>>() {
+
+    internal var suggest: ((SuggestionContext, ExecutorContext) -> List<String>)? = null
+
+    fun suggest(callback: (SuggestionContext, ExecutorContext) -> List<String>): DynamicComponent<T> {
+        suggest = callback
+        return this
+    }
 
     override fun build(): SimpleDynamicBuilder<T> {
         return SimpleDynamicBuilder(this, name, type).apply {

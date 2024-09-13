@@ -4,8 +4,10 @@ import me.mkbaka.simplecommand.common.CommandRegistry
 import me.mkbaka.simplecommand.common.command.component.LiteralComponent
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
+import org.bukkit.command.CommandSender
 import org.bukkit.command.PluginCommand
 import org.bukkit.command.SimpleCommandMap
+import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.SimplePluginManager
 

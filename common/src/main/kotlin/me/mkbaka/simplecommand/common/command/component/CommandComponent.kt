@@ -82,14 +82,14 @@ abstract class CommandComponent<R> : Permissible {
     open fun argument(
         name: String
     ): CommandComponent<*> {
-        return dynamic(name)
+        return argument(name) {}
     }
 
     open fun argument(
         name: String,
         callback: Consumer<DynamicComponent<*>>
     ): CommandComponent<*> {
-        return dynamic(name, callback)
+        return argument(name, TypeFactory.word(), callback)
     }
 
     open fun argument(
@@ -114,7 +114,7 @@ abstract class CommandComponent<R> : Permissible {
         permissionDefault: PermissionDefault,
         callback: Consumer<DynamicComponent<*>>
     ): CommandComponent<*> {
-        return dynamic(name, type, permission, permissionDefault, callback)
+        return dynamic(name, type, permission, permissionDefault) { callback.accept(this) }
     }
 
     open fun argument(
@@ -123,7 +123,7 @@ abstract class CommandComponent<R> : Permissible {
         permission: String = "",
         permissionDefault: PermissionDefault = PermissionDefault.REQUIRE
     ): CommandComponent<*> {
-        return dynamic(name, type, permission, permissionDefault)
+        return argument(name, type, permission, permissionDefault) {}
     }
 
     open fun argument(
@@ -136,52 +136,52 @@ abstract class CommandComponent<R> : Permissible {
         return dynamic(name, type, permission, permissionDefault, callback)
     }
 
-    open fun dynamic(
-        name: String
-    ): CommandComponent<*> {
-        return dynamic(name, TypeFactory.word(), "", PermissionDefault.ALLOW)
-    }
-
-    open fun dynamic(
-        name: String,
-        callback: Consumer<DynamicComponent<*>>
-    ): CommandComponent<*> {
-        return dynamic(name, TypeFactory.word(), "", PermissionDefault.ALLOW, callback)
-    }
-
-    open fun dynamic(
-        name: String,
-        type: WrappedArgumentType<*>
-    ): CommandComponent<*> {
-        return dynamic(name, type, "", PermissionDefault.ALLOW)
-    }
-
-    open fun dynamic(
-        name: String,
-        type: WrappedArgumentType<*>,
-        callback: Consumer<DynamicComponent<*>>
-    ): CommandComponent<*> {
-        return dynamic(name, type, "", PermissionDefault.ALLOW, callback)
-    }
-
-    open fun dynamic(
-        name: String,
-        type: WrappedArgumentType<*>,
-        permission: String,
-        permissionDefault: PermissionDefault
-    ): CommandComponent<*> {
-        return dynamic(name, type, permission, permissionDefault) {}
-    }
-
-    open fun dynamic(
-        name: String,
-        type: WrappedArgumentType<*>,
-        permission: String,
-        permissionDefault: PermissionDefault,
-        callback: Consumer<DynamicComponent<*>>
-    ): CommandComponent<*> {
-        return dynamic(name, type, permission, permissionDefault) { callback.accept(this) }
-    }
+//    open fun dynamic(
+//        name: String
+//    ): CommandComponent<*> {
+//        return dynamic(name, TypeFactory.word(), "", PermissionDefault.ALLOW)
+//    }
+//
+//    open fun dynamic(
+//        name: String,
+//        callback: Consumer<DynamicComponent<*>>
+//    ): CommandComponent<*> {
+//        return dynamic(name, TypeFactory.word(), "", PermissionDefault.ALLOW, callback)
+//    }
+//
+//    open fun dynamic(
+//        name: String,
+//        type: WrappedArgumentType<*>
+//    ): CommandComponent<*> {
+//        return dynamic(name, type, "", PermissionDefault.ALLOW)
+//    }
+//
+//    open fun dynamic(
+//        name: String,
+//        type: WrappedArgumentType<*>,
+//        callback: Consumer<DynamicComponent<*>>
+//    ): CommandComponent<*> {
+//        return dynamic(name, type, "", PermissionDefault.ALLOW, callback)
+//    }
+//
+//    open fun dynamic(
+//        name: String,
+//        type: WrappedArgumentType<*>,
+//        permission: String,
+//        permissionDefault: PermissionDefault
+//    ): CommandComponent<*> {
+//        return dynamic(name, type, permission, permissionDefault) {}
+//    }
+//
+//    open fun dynamic(
+//        name: String,
+//        type: WrappedArgumentType<*>,
+//        permission: String,
+//        permissionDefault: PermissionDefault,
+//        callback: Consumer<DynamicComponent<*>>
+//    ): CommandComponent<*> {
+//        return dynamic(name, type, permission, permissionDefault) { callback.accept(this) }
+//    }
 
     open fun dynamic(
         name: String,

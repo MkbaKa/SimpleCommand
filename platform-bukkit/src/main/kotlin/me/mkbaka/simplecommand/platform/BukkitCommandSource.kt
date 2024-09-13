@@ -4,7 +4,7 @@ import me.mkbaka.simplecommand.common.CommandSource
 import org.bukkit.command.CommandSender
 
 class BukkitCommandSource(
-    private val sender: CommandSender
+    val sender: CommandSender
 ) : CommandSource, CommandSender by sender {
 
     override fun toString(): String {
