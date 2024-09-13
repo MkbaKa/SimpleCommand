@@ -20,10 +20,10 @@ repositories {
 
 dependencies {
     // common 模块不包含任何平台实现
-    // implementation("me.mkbaka.simplecommand:common:1.0.0")
+    // implementation("me.mkbaka.simplecommand:common:{latest version}")
     
     // Bukkit 平台实现, 该依赖会自动包含 common 模块
-    implementation("me.mkbaka.simplecommand:platform-bukkit:1.0.0")
+    implementation("me.mkbaka.simplecommand:platform-bukkit:{latest version}")
 }
 ```
 
