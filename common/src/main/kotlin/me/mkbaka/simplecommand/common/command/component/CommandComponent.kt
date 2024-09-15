@@ -1,5 +1,6 @@
 package me.mkbaka.simplecommand.common.command.component
 
+import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.ArgumentBuilder
 import me.mkbaka.simplecommand.common.CommandSource
 import me.mkbaka.simplecommand.common.command.CommandNotify
@@ -190,7 +191,14 @@ abstract class CommandComponent<R> : Permissible {
         permissionDefault: PermissionDefault = PermissionDefault.ALLOW,
         callback: DynamicComponent<*>.() -> Unit
     ): CommandComponent<*> {
-        append(DynamicComponent(name, type, permission, permissionDefault).also(callback))
+        dynamic(DynamicComponent(name, type, permission, permissionDefault).also(callback))
+        return this
+    }
+
+    open fun dynamic(
+        component: DynamicComponent<*>
+    ): CommandComponent<*> {
+        append(component)
         return this
     }
 
@@ -248,7 +256,14 @@ abstract class CommandComponent<R> : Permissible {
         permissionDefault: PermissionDefault = PermissionDefault.REQUIRE,
         callback: LiteralComponent.() -> Unit
     ): CommandComponent<*> {
-        append(LiteralComponent(name, aliases, permission, permissionDefault).also(callback))
+        literal(LiteralComponent(name, aliases, permission, permissionDefault).also(callback))
+        return this
+    }
+
+    open fun literal(
+        component: LiteralComponent
+    ): CommandComponent<*> {
+        append(component)
         return this
     }
 
@@ -257,7 +272,11 @@ abstract class CommandComponent<R> : Permissible {
     }
 
     open fun execute(callback: (ExecutorContext) -> Unit) {
-        append(ExecutorComponent().executor(callback))
+        execute(ExecutorComponent().executor(callback))
+    }
+
+    open fun execute(component: ExecutorComponent) {
+        append(component)
     }
 
 }

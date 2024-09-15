@@ -4,7 +4,7 @@
 
 ## 添加依赖
 
-### gradle (kotlin)
+### gradle (kts)
 
 ```kotlin 
 repositories {
@@ -98,6 +98,22 @@ class TestCommand {
                 println("key = ${it["key"]}")
             }
         }
+    }
+
+    // 直接将某个类的实例作为一层明文节点
+    // 以单例对象为例:
+    @CommandBody
+    val test = object {
+
+        @CommandBody
+        val run = subCommand {
+            dynamic("player") {
+                execute {
+                    println("player = ${it["player"]}")
+                }
+            }
+        }
+
     }
 
     @CommandBody

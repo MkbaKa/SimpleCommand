@@ -11,15 +11,20 @@ fun simpleComponentOf(obj: Any): RootComponent? {
     val header = obj::class.java.getAnnotation(CommandHeader::class.java)
     val commandHeader = LiteralComponent(header.name, header.aliases, header.permission, header.permissionDefault)
 
-    val rootComponent = RootComponent(header.name, commandHeader)
+    build(obj, commandHeader)
+    return RootComponent(header.name, commandHeader)
+}
+
+private fun build(obj: Any, header: LiteralComponent) {
     obj::class.java.declaredFields.forEach { field ->
         if (!field.isAnnotationPresent(CommandBody::class.java)) return@forEach
+
         val body = field.getAnnotation(CommandBody::class.java)
 
         field.isAccessible = true
         when (val simple = field.get(obj)) {
             is SimpleSubCommand -> {
-                commandHeader.literal(
+                header.literal(
                     field.name,
                     body.aliases,
                     body.permission,
@@ -28,11 +33,16 @@ fun simpleComponentOf(obj: Any): RootComponent? {
                 )
             }
 
-            is SimpleMainCommand -> commandHeader.also(simple.callback)
+            is SimpleMainCommand -> header.also(simple.callback)
+
+            else -> build(
+                simple,
+                LiteralComponent(field.name, body.aliases, body.permission, body.permissionDefault).apply {
+                    header.literal(this)
+                }
+            )
         }
     }
-
-    return rootComponent
 }
 
 fun mainCommand(callback: LiteralComponent.() -> Unit) = SimpleMainCommand(callback)
