@@ -138,7 +138,7 @@ abstract class CommandRegistry(
         get() = commands[this] ?: commands[aliasToHeader[this]]
 
     private val String.dispatcher: CommandDispatcher<CommandSource>?
-        get() = dispatchers[this]
+        get() = dispatchers[this] ?: dispatchers[aliasToHeader[this]]
 
     private fun prepareCommand(source: CommandSource, header: String, args: Array<String>): CommandPreparation {
         val (rootComponent, dispatcher) = get(header)
@@ -149,7 +149,7 @@ abstract class CommandRegistry(
 
     private fun get(header: String): Pair<RootComponent, CommandDispatcher<CommandSource>> {
         val rootComponent = header.rootComponent ?: throw CommandNotFoundException("Command $header not found")
-        val dispatcher = header.dispatcher ?: throw CommandNotFoundException("Command $header not found")
+        val dispatcher = header.dispatcher ?: throw CommandNotFoundException("Cannot find $header's dispatcher")
         return Pair(rootComponent, dispatcher)
     }
 
