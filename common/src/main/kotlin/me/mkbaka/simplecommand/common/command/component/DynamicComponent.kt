@@ -15,9 +15,9 @@ class DynamicComponent<T>(
     override val permissionDefault: PermissionDefault
 ) : CommandComponent<SimpleDynamicBuilder<T>>() {
 
-    internal var suggest: ((SuggestionContext) -> List<String>)? = null
+    internal var suggest: ((SuggestionContext<*>) -> List<String>)? = null
 
-    fun suggest(callback: (SuggestionContext) -> List<String>): DynamicComponent<T> {
+    fun suggest(callback: (SuggestionContext<*>) -> List<String>): DynamicComponent<T> {
         suggest = callback
         return this
     }

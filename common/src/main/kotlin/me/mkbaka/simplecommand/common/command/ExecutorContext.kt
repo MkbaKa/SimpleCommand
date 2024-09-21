@@ -5,16 +5,16 @@ import me.mkbaka.simplecommand.common.CommandSource
 import me.mkbaka.simplecommand.common.command.component.CommandComponent
 import me.mkbaka.simplecommand.common.command.component.ExecutorComponent
 
-open class ExecutorContext(
-    private val original: CommandContext<CommandSource>,
+open class ExecutorContext<T : CommandSource>(
+    private val original: CommandContext<T>,
     val currentComponent: CommandComponent<*>
 ) {
 
     /**
      * 命令执行者
      */
-    val source: CommandSource
-        get() = original.source
+    val source: T
+        get() = original.source as T
 
     /**
      * 完整命令文本

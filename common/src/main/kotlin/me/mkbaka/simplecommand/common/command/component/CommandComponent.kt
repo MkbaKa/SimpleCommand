@@ -61,7 +61,8 @@ abstract class CommandComponent<R> : Permissible {
 
     protected fun ArgumentBuilder<CommandSource, *>.register(component: CommandComponent<*>) {
         when (component) {
-            is ExecutorComponent -> executes {
+            is ExecutorComponent<*> -> executes {
+                component as ExecutorComponent<CommandSource>
                 component.executor!!.invoke(ExecutorContext(it, component))
                 1
             }
@@ -266,15 +267,23 @@ abstract class CommandComponent<R> : Permissible {
         return this
     }
 
-    open fun execute(consumer: Consumer<ExecutorContext>) {
+    open fun <T : CommandSource> execute(consumer: Consumer<ExecutorContext<T>>) {
         execute { consumer.accept(it) }
     }
 
-    open fun execute(callback: (ExecutorContext) -> Unit) {
-        execute(ExecutorComponent().executor(callback))
+    open fun <T : CommandSource> execute(callback: (ExecutorContext<T>) -> Unit) {
+        execute(ExecutorComponent<T>().executor(callback))
     }
 
-    open fun execute(component: ExecutorComponent) {
+    open fun exec(callback: Consumer<ExecutorContext<CommandSource>>) {
+        execute(callback)
+    }
+
+    open fun exec(callback: (ExecutorContext<CommandSource>) -> Unit) {
+        execute(callback)
+    }
+
+    open fun <T : CommandSource> execute(component: ExecutorComponent<T>) {
         append(component)
     }
 

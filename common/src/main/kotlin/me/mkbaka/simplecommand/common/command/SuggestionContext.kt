@@ -5,11 +5,11 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import me.mkbaka.simplecommand.common.CommandSource
 import me.mkbaka.simplecommand.common.command.component.CommandComponent
 
-class SuggestionContext(
+class SuggestionContext<S : CommandSource>(
     private val builder: SuggestionsBuilder,
-    context: CommandContext<CommandSource>,
+    context: CommandContext<S>,
     component: CommandComponent<*>
-) : ExecutorContext(context, component) {
+) : ExecutorContext<S>(context, component) {
 
     /**
      * 当前节点位置对应的文本内容

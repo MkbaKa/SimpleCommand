@@ -9,7 +9,7 @@ import me.mkbaka.simplecommand.common.command.permission.PermissionDefault
 /**
  * 命令执行组件
  */
-class ExecutorComponent : CommandComponent<RequiredArgumentBuilder<CommandSource, String>>() {
+class ExecutorComponent<S : CommandSource> : CommandComponent<RequiredArgumentBuilder<S, String>>() {
 
     override val permission: String
         get() = ""
@@ -17,9 +17,9 @@ class ExecutorComponent : CommandComponent<RequiredArgumentBuilder<CommandSource
     override val permissionDefault: PermissionDefault
         get() = PermissionDefault.ALLOW
 
-    internal var executor: ((ExecutorContext) -> Unit)? = null
+    internal var executor: ((ExecutorContext<S>) -> Unit)? = null
 
-    fun executor(executor: (ExecutorContext) -> Unit): ExecutorComponent {
+    fun executor(executor: (ExecutorContext<S>) -> Unit): ExecutorComponent<S> {
         this.executor = executor
         return this
     }
@@ -56,7 +56,7 @@ class ExecutorComponent : CommandComponent<RequiredArgumentBuilder<CommandSource
     }
 
     // 永远都不会使用这个函数
-    override fun build(): RequiredArgumentBuilder<CommandSource, String> {
+    override fun build(): RequiredArgumentBuilder<S, String> {
         throw IllegalStateException("ExecutorComponent cannot build")
     }
 
