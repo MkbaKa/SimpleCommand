@@ -2,11 +2,12 @@ package me.mkbaka.simplecommand.common.command
 
 import com.mojang.brigadier.context.CommandContext
 import me.mkbaka.simplecommand.common.CommandSource
+import me.mkbaka.simplecommand.common.command.component.CommandComponent
 import me.mkbaka.simplecommand.common.command.component.ExecutorComponent
 
 open class ExecutorContext(
     private val original: CommandContext<CommandSource>,
-    val currentComponent: ExecutorComponent
+    val currentComponent: CommandComponent<*>
 ) {
 
     /**
