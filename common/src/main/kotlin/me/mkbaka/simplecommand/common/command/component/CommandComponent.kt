@@ -1,13 +1,12 @@
 package me.mkbaka.simplecommand.common.command.component
 
-import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.ArgumentBuilder
 import me.mkbaka.simplecommand.common.CommandSource
 import me.mkbaka.simplecommand.common.command.CommandNotify
 import me.mkbaka.simplecommand.common.command.ExecutorContext
 import me.mkbaka.simplecommand.common.command.argument.TypeFactory
-import me.mkbaka.simplecommand.common.command.argument.impl.TypeString
 import me.mkbaka.simplecommand.common.command.argument.WrappedArgumentType
+import me.mkbaka.simplecommand.common.command.argument.impl.TypeString
 import me.mkbaka.simplecommand.common.command.permission.Permissible
 import me.mkbaka.simplecommand.common.command.permission.PermissionDefault
 import java.util.function.Consumer
@@ -63,7 +62,7 @@ abstract class CommandComponent<R> : Permissible {
     protected fun ArgumentBuilder<CommandSource, *>.register(component: CommandComponent<*>) {
         when (component) {
             is ExecutorComponent -> executes {
-                component.executor!!.invoke(ExecutorContext(it))
+                component.executor!!.invoke(ExecutorContext(it, component))
                 1
             }
 
