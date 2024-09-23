@@ -94,9 +94,18 @@ class TestCommand {
                 listOf("value1", "value2", "value3")
             }
             
-            execute {
+            // 若使用 exec 来增加 executor 组件
+            // 则默认限定执行者为 CommandSource
+            exec {
                 println("key = ${it["key"]}")
             }
+            
+            // 若使用 execute 来增加 executor 组件
+            // 可以指定平台的对象类型 前提是已经用包装过了对应的 CommandSource
+            // 比如 https://github.com/MkbaKa/SimpleCommand/blob/main/platform-bukkit/src/main/kotlin/me/mkbaka/simplecommand/platform/BukkitCommandSource.kt
+            // execute<Player> {
+            // 
+            // }
         }
     }
 
@@ -108,7 +117,7 @@ class TestCommand {
         @CommandBody
         val run = subCommand {
             dynamic("player") {
-                execute {
+                exec {
                     println("player = ${it["player"]}")
                 }
             }
@@ -121,11 +130,11 @@ class TestCommand {
         //               TypePlayer 与 TypeWorld 均为已实现的参数类型
         dynamic("player", TypePlayer.player()) {
             dynamic("world", TypeWorld.world()) {
-                execute {
+                exec {
                     println("player = ${it.get<Player>("player")} | world = ${it.get<World>("world")}")
                 }
             }
-            execute {
+            exec {
                 println(it.get<Player>("player"))
             }
         }
