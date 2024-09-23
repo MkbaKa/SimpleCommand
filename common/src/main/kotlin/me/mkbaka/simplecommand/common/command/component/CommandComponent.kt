@@ -57,6 +57,10 @@ abstract class CommandComponent<R> : Permissible {
         this.invalidArgument = callback
     }
 
+    fun incorrectArgument(callback: (source: CommandSource, input: String, header: String, args: Array<String>) -> Unit) {
+        this.invalidArgument = CommandNotify(callback)
+    }
+
     /**
      * 设置命令源错误时的回调
      *
@@ -64,6 +68,10 @@ abstract class CommandComponent<R> : Permissible {
      */
     fun incorrectCommandSource(callback: CommandNotify) {
         this.incorrectCommandSource = callback
+    }
+
+    fun incorrectCommandSource(callback: (source: CommandSource, input: String, header: String, args: Array<String>) -> Unit) {
+        this.incorrectCommandSource = CommandNotify(callback)
     }
 
     /**

@@ -2,7 +2,6 @@ package me.mkbaka.simplecommand.common.command.component
 
 import com.mojang.brigadier.tree.RootCommandNode
 import me.mkbaka.simplecommand.common.CommandSource
-import me.mkbaka.simplecommand.common.command.CommandNotify
 
 /**
  * 只是一个数据类
@@ -14,13 +13,17 @@ class RootComponent(
 ) : RootCommandNode<CommandSource>() {
 
     init {
-        subComponent.incorrectArgument(CommandNotify { source, input, header, args ->
+        subComponent.incorrectArgument { source, input, header, args ->
             source.sendMessage("invalid argument by RootComponent: ${args.contentToString()}")
-        })
+        }
 
-        subComponent.onPermissionCheckFailure(CommandNotify { source, input, header, args ->
+        subComponent.incorrectCommandSource { source, input, header, args ->
+            source.sendMessage("incorrect command source by RootComponent")
+        }
+
+        subComponent.onPermissionCheckFailure { source, input, header, args ->
             source.sendMessage("You need permission \"${subComponent.permission}\" to use this command.")
-        })
+        }
     }
 
     override fun getName(): String {
