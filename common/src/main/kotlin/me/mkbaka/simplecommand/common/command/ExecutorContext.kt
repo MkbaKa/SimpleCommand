@@ -5,8 +5,8 @@ import me.mkbaka.simplecommand.common.CommandSource
 import me.mkbaka.simplecommand.common.command.component.CommandComponent
 import me.mkbaka.simplecommand.common.command.component.ExecutorComponent
 
-open class ExecutorContext<T : CommandSource>(
-    private val original: CommandContext<T>,
+open class ExecutorContext<T>(
+    private val original: CommandContext<*>,
     val currentComponent: CommandComponent<*>
 ) {
 

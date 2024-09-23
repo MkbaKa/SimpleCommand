@@ -4,8 +4,11 @@ import me.mkbaka.simplecommand.common.CommandSource
 import org.bukkit.command.CommandSender
 
 class BukkitCommandSource(
-    val sender: CommandSender
+    private val sender: CommandSender
 ) : CommandSource, CommandSender by sender {
+
+    override val origin: Any
+        get() = sender
 
     override fun toString(): String {
         return sender.toString()

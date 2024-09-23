@@ -34,6 +34,13 @@ abstract class CommandComponent<R> : Permissible {
         private set
 
     /**
+     * 命令源非 execute 组件指定泛型时的回调
+     * 即 命令源 类型错误
+     */
+    internal var incorrectCommandSource: CommandNotify? = null
+        private set
+
+    /**
      * 未通过权限判断回调
      */
     internal var permissionFailure: CommandNotify? = null
@@ -51,6 +58,15 @@ abstract class CommandComponent<R> : Permissible {
     }
 
     /**
+     * 设置命令源错误时的回调
+     *
+     * @param [callback]
+     */
+    fun incorrectCommandSource(callback: CommandNotify) {
+        this.incorrectCommandSource = callback
+    }
+
+    /**
      * 设置权限判断未通过时的回调
      *
      * @param [callback]
@@ -59,11 +75,39 @@ abstract class CommandComponent<R> : Permissible {
         this.permissionFailure = callback
     }
 
+    fun findOrNull(
+        selector: (CommandComponent<*>) -> Boolean
+    ): CommandComponent<*>? {
+        return generateSequence(this) {
+            it.parent as CommandComponent<R>
+        }.firstOrNull(selector)
+    }
+
+    fun findNotNull(
+        errorMsg: String,
+        selector: (CommandComponent<*>) -> Boolean
+    ): CommandComponent<*> {
+        return findOrNull(selector) ?: error(errorMsg)
+    }
+
     protected fun ArgumentBuilder<CommandSource, *>.register(component: CommandComponent<*>) {
         when (component) {
-            is ExecutorComponent<*> -> executes {
-                component as ExecutorComponent<CommandSource>
-                component.executor!!.invoke(ExecutorContext(it, component))
+            is ExecutorComponent<*> -> executes { ctx ->
+                // 若命令源或者其原始对象是 executor 组件的限定类型则执行 executor
+                // 否则执行 incorrectCommandSource 回调
+                if (component.source.isInstance(ctx.source)
+                    || component.source.isInstance(ctx.source.origin)
+                ) {
+                    component as ExecutorComponent<CommandSource>
+                    component.executor!!.invoke(ExecutorContext(ctx, component))
+                } else {
+                    val args = ctx.input.split(" ").toMutableList()
+                    component.findNotNull(
+                        "Cannot find incorrect command source notify for this commands."
+                    ) {
+                        it.incorrectCommandSource != null
+                    }.incorrectCommandSource!!.invoke(ctx.source, ctx.input, args.removeFirst(), args.toTypedArray())
+                }
                 1
             }
 
@@ -267,23 +311,27 @@ abstract class CommandComponent<R> : Permissible {
         return this
     }
 
-    open fun <T : CommandSource> execute(consumer: Consumer<ExecutorContext<T>>) {
-        execute { consumer.accept(it) }
+    open fun <T : CommandSource> execute(source: Class<*>, consumer: Consumer<ExecutorContext<T>>) {
+        execute(source) { consumer.accept(it) }
     }
 
-    open fun <T : CommandSource> execute(callback: (ExecutorContext<T>) -> Unit) {
-        execute(ExecutorComponent<T>().executor(callback))
+    open fun <T> execute(source: Class<*>, callback: (ExecutorContext<T>) -> Unit) {
+        execute(ExecutorComponent<T>(source).executor(callback))
+    }
+
+    inline fun <reified T> execute(noinline callback: (ExecutorContext<T>) -> Unit) {
+        execute(T::class.java, callback)
     }
 
     open fun exec(callback: Consumer<ExecutorContext<CommandSource>>) {
-        execute(callback)
+        execute(CommandSource::class.java, callback)
     }
 
     open fun exec(callback: (ExecutorContext<CommandSource>) -> Unit) {
-        execute(callback)
+        execute(CommandSource::class.java, callback)
     }
 
-    open fun <T : CommandSource> execute(component: ExecutorComponent<T>) {
+    open fun <T> execute(component: ExecutorComponent<T>) {
         append(component)
     }
 

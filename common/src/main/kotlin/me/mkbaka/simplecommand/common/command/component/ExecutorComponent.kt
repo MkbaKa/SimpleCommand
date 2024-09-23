@@ -9,7 +9,9 @@ import me.mkbaka.simplecommand.common.command.permission.PermissionDefault
 /**
  * 命令执行组件
  */
-class ExecutorComponent<S : CommandSource> : CommandComponent<RequiredArgumentBuilder<S, String>>() {
+class ExecutorComponent<S>(
+    val source: Class<*>
+) : CommandComponent<RequiredArgumentBuilder<S, String>>() {
 
     override val permission: String
         get() = ""

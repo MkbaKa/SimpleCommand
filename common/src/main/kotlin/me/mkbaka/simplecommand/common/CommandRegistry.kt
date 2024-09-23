@@ -6,7 +6,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
-import me.mkbaka.simplecommand.common.command.CommandNotify
 import me.mkbaka.simplecommand.common.command.component.CommandComponent
 import me.mkbaka.simplecommand.common.command.component.LiteralComponent
 import me.mkbaka.simplecommand.common.command.component.RootComponent
@@ -104,8 +103,7 @@ abstract class CommandRegistry(
             // 子节点错误, 参数错误, 不在数值类参数限定范围 等等... 统一执行参数错误的回调
             if (e.type::class.java in exceptionTypes) {
                 // RootComponent 会在 init 中赋值, 所以这个报错一定不会出现
-                findNotNull(
-                    preparation.currentComponent,
+                preparation.currentComponent.findNotNull(
                     "Cannot find argument notify for this commands."
                 ) { comp ->
                     comp.invalidArgument != null
@@ -160,15 +158,14 @@ abstract class CommandRegistry(
         args: Array<String>
     ): Boolean {
         // 查找需要判断权限的父组件
-        findOrNull(preparation.currentComponent) {
+        preparation.currentComponent.findOrNull {
             it.permissionDefault == PermissionDefault.REQUIRE
         }?.let { comp ->
             // 若权限不足则执行回调并退出执行
             if (!source.hasPermission(comp.permission)) {
                 // 查找赋值过的回调函数
                 // RootComponent 会在 init 中赋值, 所以错误信息一定不会出现
-                findNotNull(
-                    preparation.currentComponent,
+                preparation.currentComponent.findNotNull(
                     "Cannot find permission notify for this commands."
                 ) {
                     it.permissionFailure != null
@@ -179,22 +176,22 @@ abstract class CommandRegistry(
         return true
     }
 
-    private fun findOrNull(
-        start: CommandComponent<*>,
-        selector: (CommandComponent<*>) -> Boolean
-    ): CommandComponent<*>? {
-        return generateSequence(start) {
-            it.parent
-        }.firstOrNull(selector)
-    }
-
-    private fun findNotNull(
-        start: CommandComponent<*>,
-        errorMsg: String,
-        selector: (CommandComponent<*>) -> Boolean
-    ): CommandComponent<*> {
-        return findOrNull(start, selector) ?: error(errorMsg)
-    }
+//    private fun findOrNull(
+//        start: CommandComponent<*>,
+//        selector: (CommandComponent<*>) -> Boolean
+//    ): CommandComponent<*>? {
+//        return generateSequence(start) {
+//            it.parent
+//        }.firstOrNull(selector)
+//    }
+//
+//    private fun findNotNull(
+//        start: CommandComponent<*>,
+//        errorMsg: String,
+//        selector: (CommandComponent<*>) -> Boolean
+//    ): CommandComponent<*> {
+//        return findOrNull(start, selector) ?: error(errorMsg)
+//    }
 
     private fun ParseResults<*>.getCurrentComponent(): CommandComponent<*> {
         return (this.context.nodes.lastOrNull { it.node is WrappedCommandNode }?.node as? WrappedCommandNode)?.component
