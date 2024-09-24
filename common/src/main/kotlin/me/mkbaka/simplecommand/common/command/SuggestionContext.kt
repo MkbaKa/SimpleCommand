@@ -9,7 +9,7 @@ class SuggestionContext<S : CommandSource>(
     private val builder: SuggestionsBuilder,
     context: CommandContext<S>,
     component: CommandComponent<*>
-) : ExecutorContext<S>(context, component) {
+) : ExecutorContext<S>(context, component, context.source) {
 
     /**
      * 当前节点位置对应的文本内容

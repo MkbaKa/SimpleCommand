@@ -103,18 +103,30 @@ abstract class CommandComponent<R> : Permissible {
             is ExecutorComponent<*> -> executes { ctx ->
                 // 若命令源或者其原始对象是 executor 组件的限定类型则执行 executor
                 // 否则执行 incorrectCommandSource 回调
-                if (component.source.isInstance(ctx.source)
-                    || component.source.isInstance(ctx.source.origin)
-                ) {
-                    component as ExecutorComponent<CommandSource>
-                    component.executor!!.invoke(ExecutorContext(ctx, component))
-                } else {
-                    val args = ctx.input.split(" ").toMutableList()
-                    component.findNotNull(
-                        "Cannot find incorrect command source notify for this commands."
-                    ) {
-                        it.incorrectCommandSource != null
-                    }.incorrectCommandSource!!.invoke(ctx.source, ctx.input, args.removeFirst(), args.toTypedArray())
+                when {
+                    component.source.isInstance(ctx.source) -> {
+                        component as ExecutorComponent<CommandSource>
+                        component.executor!!.invoke(ExecutorContext(ctx, component, ctx.source))
+                    }
+
+                    component.source.isInstance(ctx.source.origin) -> {
+                        component as ExecutorComponent<Any>
+                        component.executor!!.invoke(ExecutorContext(ctx, component, ctx.source.origin))
+                    }
+
+                    else -> {
+                        val args = ctx.input.split(" ").toMutableList()
+                        component.findNotNull(
+                            "Cannot find incorrect command source notify for this commands."
+                        ) {
+                            it.incorrectCommandSource != null
+                        }.incorrectCommandSource!!.invoke(
+                            ctx.source,
+                            ctx.input,
+                            args.removeFirst(),
+                            args.toTypedArray()
+                        )
+                    }
                 }
                 1
             }

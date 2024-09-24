@@ -1,6 +1,7 @@
 package me.mkbaka.simplecommand.common.command.wrapper
 
 import com.mojang.brigadier.builder.ArgumentBuilder
+import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.CommandNode
 import me.mkbaka.simplecommand.common.CommandSource
 import me.mkbaka.simplecommand.common.command.SuggestionContext
@@ -18,17 +19,17 @@ class SimpleDynamicBuilder<T>(
     }
 
     override fun build(): CommandNode<CommandSource> {
-        val result = DynamicCommandNode(
-            component, name, type, command, requirement, redirect, redirectModifier, isFork
-        ) { context, builder ->
-            component.suggest?.invoke(SuggestionContext(builder, context, component))?.forEach {
-                builder.suggest(it)
-            }
-            builder.buildFuture()
-        }
+        val result = DynamicCommandNode(component, name, type, command, requirement, redirect, redirectModifier, isFork,
+            component.suggest?.run {
+                SuggestionProvider<CommandSource> { context, builder ->
+                    this@run.invoke(SuggestionContext(builder, context, component)).forEach {
+                        builder.suggest(it)
+                    }
+                    builder.buildFuture()
+                }
+            })
 
         arguments.forEach { result.addChild(it) }
-
         return result
     }
 

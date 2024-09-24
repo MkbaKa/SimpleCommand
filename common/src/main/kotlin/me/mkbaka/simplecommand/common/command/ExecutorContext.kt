@@ -3,24 +3,34 @@ package me.mkbaka.simplecommand.common.command
 import com.mojang.brigadier.context.CommandContext
 import me.mkbaka.simplecommand.common.CommandSource
 import me.mkbaka.simplecommand.common.command.component.CommandComponent
-import me.mkbaka.simplecommand.common.command.component.ExecutorComponent
 
-open class ExecutorContext<T>(
-    private val original: CommandContext<*>,
-    val currentComponent: CommandComponent<*>
+open class ExecutorContext<S>(
+    private val origin: CommandContext<out CommandSource>,
+    val currentComponent: CommandComponent<*>,
+    private val s: S
 ) {
 
     /**
      * 命令执行者
      */
-    val source: T
-        get() = original.source as T
+    val source: S
+        get() = s
+        // 无法理解为什么 catch 不到这个 ClassCastException
+        // 只能用个最傻逼的办法解决了
+//        get() = (origin.source as S) ?: origin.source.origin as S
+//        get() = try {
+//            origin.source as S
+//        } catch (e: Throwable) {
+//        } catch (e: ClassCastException) {
+//            println("exception!!!")
+//            origin.source.origin as S
+//        }
 
     /**
      * 完整命令文本
      */
     val input: String
-        get() = original.input
+        get() = origin.input
 
     /**
      * 获取参数
@@ -74,12 +84,12 @@ open class ExecutorContext<T>(
      */
     fun <T> getArgument(key: String, type: Class<T>): T? {
         return try {
-            original.getArgument(key, type)
+            origin.getArgument(key, type)
 //        } catch (e: IllegalArgumentException | NullPointerException) {
-        //         传入的 key 不存在
+            //         传入的 key 不存在
         } catch (e: IllegalArgumentException) {
             null
-        //         ArgumentType 获取到的结果为 null
+            //         ArgumentType 获取到的结果为 null
         } catch (e: NullPointerException) {
             null
         }
