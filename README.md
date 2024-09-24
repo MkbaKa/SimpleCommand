@@ -96,16 +96,19 @@ class TestCommand {
             
             // 若使用 exec 来增加 executor 组件
             // 则默认限定执行者为 CommandSource
-            exec {
-                println("key = ${it["key"]}")
-            }
+            // exec {
+            //    println("key = ${it["key"]}")
+            // }
             
             // 若使用 execute 来增加 executor 组件
             // 可以指定平台的对象类型 前提是已经用包装过了对应的 CommandSource
             // 比如 https://github.com/MkbaKa/SimpleCommand/blob/main/platform-bukkit/src/main/kotlin/me/mkbaka/simplecommand/platform/BukkitCommandSource.kt
-            // execute<Player> {
-            // 
-            // }
+            // 重写了 origin 字段 返回的是 bukkit 平台的 CommandSender
+            // execute 在执行时 会判断这个 CommandSender 是不是 Player 类型的实例
+            // 若是则执行代码块   若不是则执行 incorrectCommandSource 回调函数
+            execute<Player> { ctx ->
+                ctx.source.kickPlayer("疯狂星期四!")
+            }
         }
     }
 
@@ -161,8 +164,9 @@ public class ExampleCommand {
 
     @CommandBody
     public static final SimpleMainCommand main = ComponentExtraJava.mainCommand(literal -> {
-        literal.execute(context -> {
-            System.out.println("this is main command");
+        //      ↓ java这个泛型好丑(
+        literal.<Player>execute(Player.class, context -> {
+            context.getSource().kickPlayer("疯狂星期四!");
         });
     });
 
@@ -170,11 +174,11 @@ public class ExampleCommand {
     public static final SimpleSubCommand kill = ComponentExtraJava.subCommand(literal -> {
         literal.argument("player", TypePlayer.player(), playerArg -> {
             playerArg.argument("world", TypeWorld.world(), worldArg -> {
-                worldArg.execute(context -> {
+                worldArg.exec(context -> {
                     System.out.println("kill player " + context.getBy("player", Player.class) + " in world " + context.getBy("world", World.class));
                 });
             });
-            playerArg.execute(context -> {
+            playerArg.exec(context -> {
                 System.out.println(context.getBy("player", Player.class));
             });
         });
@@ -183,17 +187,17 @@ public class ExampleCommand {
     @CommandBody
     public static final SimpleSubCommand sub = ComponentExtraJava.subCommand(literal -> {
         literal.argument("arg1", TypeFactory.string(), argument -> {
-            argument.execute(context -> {
+            argument.exec(context -> {
                 System.out.println("arg1 = " + context.get("arg1"));
             });
 
             argument.argument("arg2", TypeFactory.intType(), argument2 -> {
-                argument2.execute(context -> {
+                argument2.exec(context -> {
                     System.out.println("arg2 = " + context.getBy("arg2", Integer.class));
                 });
             });
         });
-        literal.execute(context -> {
+        literal.exec(context -> {
             System.out.println(context);
         });
     });

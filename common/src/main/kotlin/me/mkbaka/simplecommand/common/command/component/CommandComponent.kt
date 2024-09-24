@@ -319,7 +319,7 @@ abstract class CommandComponent<R> : Permissible {
         return this
     }
 
-    open fun <T : CommandSource> execute(source: Class<*>, consumer: Consumer<ExecutorContext<T>>) {
+    open fun <T> execute(source: Class<*>, consumer: Consumer<ExecutorContext<T>>) {
         execute(source) { consumer.accept(it) }
     }
 

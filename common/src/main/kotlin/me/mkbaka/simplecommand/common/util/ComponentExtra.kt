@@ -9,10 +9,10 @@ fun simpleComponentOf(obj: Any): RootComponent? {
     if (!obj::class.java.isAnnotationPresent(CommandHeader::class.java)) return null
 
     val header = obj::class.java.getAnnotation(CommandHeader::class.java)
+
     val commandHeader = LiteralComponent(header.name, header.aliases, header.permission, header.permissionDefault)
 
-    build(obj, commandHeader)
-    return RootComponent(header.name, commandHeader)
+    return RootComponent(header.name, commandHeader).also { build(obj, commandHeader) }
 }
 
 private fun build(obj: Any, header: LiteralComponent) {
