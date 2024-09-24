@@ -41,7 +41,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'me.mkbaka.simplecommand:platform-bukkit:1.0.0'
+    implementation 'me.mkbaka.simplecommand:platform-bukkit:{latest version}'
 }
 ```
 
