@@ -13,15 +13,17 @@ class RootComponent(
 ) : RootCommandNode<CommandSource>() {
 
     init {
-        subComponent.incorrectArgument { source, input, header, args ->
+        subComponent.rootComponent = this
+
+        subComponent.incorrectArgument { source, _, _, _, args ->
             source.sendMessage("invalid argument by RootComponent: ${args.contentToString()}")
         }
 
-        subComponent.incorrectCommandSource { source, input, header, args ->
+        subComponent.incorrectCommandSource { source, _, _, _, _ ->
             source.sendMessage("incorrect command source by RootComponent")
         }
 
-        subComponent.onPermissionCheckFailure { source, input, header, args ->
+        subComponent.onPermissionCheckFailure { source, _, _, _, _ ->
             source.sendMessage("You need permission \"${subComponent.permission}\" to use this command.")
         }
     }

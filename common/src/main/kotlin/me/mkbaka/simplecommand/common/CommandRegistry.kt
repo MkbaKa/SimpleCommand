@@ -107,7 +107,7 @@ abstract class CommandRegistry(
                     "Cannot find argument notify for this commands."
                 ) { comp ->
                     comp.invalidArgument != null
-                }.invalidArgument!!.invoke(source, preparation.inputString, header, args)
+                }.invalidArgument!!.invoke(source, preparation.currentComponent, preparation.inputString, header, args)
             } else {
                 e.printStackTrace()
             }
@@ -159,7 +159,7 @@ abstract class CommandRegistry(
     ): Boolean {
         // 查找需要判断权限的父组件
         preparation.currentComponent.findOrNull {
-            it.permissionDefault == PermissionDefault.REQUIRE
+            it.requirePermission()
         }?.let { comp ->
             // 若权限不足则执行回调并退出执行
             if (!source.hasPermission(comp.permission)) {
@@ -169,29 +169,12 @@ abstract class CommandRegistry(
                     "Cannot find permission notify for this commands."
                 ) {
                     it.permissionFailure != null
-                }.permissionFailure!!.invoke(source, preparation.inputString, header, args)
+                }.permissionFailure!!.invoke(source, preparation.currentComponent, preparation.inputString, header, args)
                 return false
             }
         }
         return true
     }
-
-//    private fun findOrNull(
-//        start: CommandComponent<*>,
-//        selector: (CommandComponent<*>) -> Boolean
-//    ): CommandComponent<*>? {
-//        return generateSequence(start) {
-//            it.parent
-//        }.firstOrNull(selector)
-//    }
-//
-//    private fun findNotNull(
-//        start: CommandComponent<*>,
-//        errorMsg: String,
-//        selector: (CommandComponent<*>) -> Boolean
-//    ): CommandComponent<*> {
-//        return findOrNull(start, selector) ?: error(errorMsg)
-//    }
 
     private fun ParseResults<*>.getCurrentComponent(): CommandComponent<*> {
         return (this.context.nodes.lastOrNull { it.node is WrappedCommandNode }?.node as? WrappedCommandNode)?.component

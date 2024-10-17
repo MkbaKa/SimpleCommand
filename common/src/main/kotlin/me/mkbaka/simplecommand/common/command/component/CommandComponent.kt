@@ -16,6 +16,9 @@ import java.util.function.Consumer
  */
 abstract class CommandComponent<R> : Permissible {
 
+    var rootComponent: RootComponent? = null
+        internal set
+
     /**
      * 父组件
      */
@@ -57,7 +60,7 @@ abstract class CommandComponent<R> : Permissible {
         this.invalidArgument = callback
     }
 
-    fun incorrectArgument(callback: (source: CommandSource, input: String, header: String, args: Array<String>) -> Unit) {
+    fun incorrectArgument(callback: (source: CommandSource, currentComponent: CommandComponent<*>, input: String, header: String, args: Array<String>) -> Unit) {
         this.invalidArgument = CommandNotify(callback)
     }
 
@@ -70,7 +73,7 @@ abstract class CommandComponent<R> : Permissible {
         this.incorrectCommandSource = callback
     }
 
-    fun incorrectCommandSource(callback: (source: CommandSource, input: String, header: String, args: Array<String>) -> Unit) {
+    fun incorrectCommandSource(callback: (source: CommandSource, currentComponent: CommandComponent<*>, input: String, header: String, args: Array<String>) -> Unit) {
         this.incorrectCommandSource = CommandNotify(callback)
     }
 
@@ -87,7 +90,7 @@ abstract class CommandComponent<R> : Permissible {
         selector: (CommandComponent<*>) -> Boolean
     ): CommandComponent<*>? {
         return generateSequence(this) {
-            it.parent as CommandComponent<R>
+            it.parent as? CommandComponent<R>
         }.firstOrNull(selector)
     }
 
@@ -122,6 +125,7 @@ abstract class CommandComponent<R> : Permissible {
                             it.incorrectCommandSource != null
                         }.incorrectCommandSource!!.invoke(
                             ctx.source,
+                            component,
                             ctx.input,
                             args.removeFirst(),
                             args.toTypedArray()
@@ -140,6 +144,7 @@ abstract class CommandComponent<R> : Permissible {
 
     private fun append(subComponent: CommandComponent<*>): CommandComponent<*> {
         subComponent.parent = this
+        subComponent.rootComponent = rootComponent
         children.add(subComponent)
         return this
     }

@@ -1,15 +1,22 @@
 package me.mkbaka.simplecommand.common.command
 
 import me.mkbaka.simplecommand.common.CommandSource
+import me.mkbaka.simplecommand.common.command.component.CommandComponent
 
 class CommandNotify(
-    private val callback: (source: CommandSource, input: String, header: String, args: Array<String>) -> Unit
+    private val callback: (source: CommandSource, currentComponent: CommandComponent<*>, input: String, header: String, args: Array<String>) -> Unit
 ) {
 
     constructor(callback: CommandNotifyCallback) : this(callback::execute)
 
-    operator fun invoke(source: CommandSource, input: String, header: String, args: Array<String>) {
-        callback(source, input, header, args)
+    operator fun invoke(
+        source: CommandSource,
+        currentComponent: CommandComponent<*>,
+        input: String,
+        header: String,
+        args: Array<String>
+    ) {
+        callback(source, currentComponent, input, header, args)
     }
 
 }
@@ -17,6 +24,12 @@ class CommandNotify(
 @FunctionalInterface
 interface CommandNotifyCallback {
 
-    fun execute(source: CommandSource, input: String, header: String, args: Array<String>)
+    fun execute(
+        source: CommandSource,
+        currentComponent: CommandComponent<*>,
+        input: String,
+        header: String,
+        args: Array<String>
+    )
 
 }
