@@ -10,6 +10,7 @@ import org.bukkit.command.SimpleCommandMap
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.SimplePluginManager
+import java.lang.invoke.MethodHandles
 
 class BukkitCommandRegistry(
     private val plugin: Plugin
@@ -29,11 +30,21 @@ class BukkitCommandRegistry(
                 super.tabCompleter(BukkitCommandSource(sender), header, args)
             }
 
-            commandMap.register(pluginCommand.name, pluginCommand)
+            Bukkit.getScheduler().callSyncMethod(plugin) {
+                commandMap.register(pluginCommand.name, pluginCommand)
+                if (ServerVersion.major >= 5) {
+                    syncCommands.invoke(Bukkit.getServer())
+                }
+            }
         } != null
     }
 
     companion object {
+
+        private val syncCommands by lazy {
+            val method = Bukkit.getServer()::class.java.getMethod("syncCommands")
+            MethodHandles.publicLookup().unreflect(method)
+        }
 
         private val commandMap by lazy {
             SimplePluginManager::class.java.getDeclaredField("commandMap").run {
