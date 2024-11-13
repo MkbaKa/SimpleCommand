@@ -1,8 +1,0 @@
-name: SimpleCommandPlugin
-main: me.mkbaka.simplecommand.platform.BukkitPlugin
-version: 1.0.0
-
-authors:
-  - 'Mkbakaa'
-
-api-version: 1.13
