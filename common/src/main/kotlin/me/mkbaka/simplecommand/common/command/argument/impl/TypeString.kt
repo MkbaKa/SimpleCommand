@@ -1,6 +1,7 @@
 package me.mkbaka.simplecommand.common.command.argument.impl
 
 import com.mojang.brigadier.StringReader
+import com.mojang.brigadier.StringReader.isQuotedStringStart
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
@@ -14,8 +15,39 @@ class TypeString(
 
     private val stringType = type.get()
 
+    /**
+     * 原方法 com.mojang.brigadier.StringReader#readUnquotedString
+     * 仅支持 0-9 a-z A-Z  _ - . +
+     * 不符合需求
+     */
+    private fun readUnquotedString(reader: StringReader): String {
+        val start = reader.cursor
+        while (reader.canRead() && reader.peek() != ' ') {
+            reader.skip()
+        }
+        return reader.string.substring(start, reader.cursor)
+    }
+
+    private fun readString(reader: StringReader): String {
+        if (!reader.canRead()) {
+            return "";
+        }
+        val next = reader.peek();
+        if (isQuotedStringStart(next)) {
+            reader.skip();
+            return reader.readStringUntil(next);
+        }
+        return readUnquotedString(reader);
+    }
+
     override fun parse(reader: StringReader): String {
-        return stringType.parse(reader)
+        return when (stringType.type) {
+            StringArgumentType.StringType.SINGLE_WORD -> readUnquotedString(reader)
+
+            StringArgumentType.StringType.QUOTABLE_PHRASE -> readString(reader)
+
+            else -> stringType.parse(reader)
+        }
     }
 
     override fun <S : Any?> listSuggestions(
