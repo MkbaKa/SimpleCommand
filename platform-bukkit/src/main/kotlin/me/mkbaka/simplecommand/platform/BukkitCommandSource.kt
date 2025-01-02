@@ -11,7 +11,7 @@ class BukkitCommandSource(
         get() = sender
 
     override fun toString(): String {
-        return sender.toString()
+        return "BukkitCommandSource{origin=$sender}"
     }
 
     override fun hashCode(): Int {
